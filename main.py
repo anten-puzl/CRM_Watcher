@@ -14,6 +14,7 @@ login_1c = os.getenv('LOGIN_1C')
 password_1c = os.getenv('PASSWORD_1C')
 name_of_base = os.getenv('NAME_OF_BASE')
 name_of_file = os.getenv('NAME_OF_FILE')
+error_message_file = os.getenv('ERROR_MESSAGE_FILE')
 
 
 def get_list_of_chats():
@@ -53,6 +54,14 @@ def delete_chat():
                 json_file.write(json_string)
 
 
+def read_error_messages():
+    """Читает сообщения из файла с ошибками"""
+    if os.path.exists(error_message_file):
+        with open(error_message_file, 'r', encoding='utf-8') as f:
+            return f.read().strip()
+    return None
+
+
 try:
     url = f"https://api.telegram.org/bot{TOKEN}/getUpdates"
     answer = requests.get(url).json()
@@ -72,11 +81,20 @@ except Exception as e:
     for chat_id in list_of_chats:
         if list_of_chats[chat_id] == 'admin':
             message = str(e)
-            url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={list_of_chats[0]}&text={message}"
+            url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}&text={message}"
             requests.get(url).json()  # this sends the message
 
 list_of_chats = get_list_of_chats()
 try:
+    # Проверяем наличие сообщений в файле
+    error_message = read_error_messages()
+    if error_message:
+        # Отправляем сообщение всем пользователям
+        for chat_id in list_of_chats:
+            url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}&text={error_message}"
+            requests.get(url).json()
+    
+    # Проверка 1С
     for chat_id in list_of_chats:
         Connector1c = win32.gencache.EnsureDispatch('V83.COMConnector')
         agent = Connector1c.ConnectAgent("tcp://127.0.0.1:1540")
