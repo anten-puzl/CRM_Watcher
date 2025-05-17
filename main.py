@@ -2,12 +2,18 @@ import win32com.client as win32
 import json
 import requests
 import os.path
+import os
+from dotenv import load_dotenv
 
-TOKEN = 'Token_of_bot'
-login_1c = 'your_login_to_1c'
-password_1c = 'your_password_to_1c'
-name_of_base = 'name_of_base'
-name_of_file = 'chats.json'
+# Загрузка переменных окружения из файла .env
+load_dotenv()
+
+# Получение переменных окружения
+TOKEN = os.getenv('TOKEN')
+login_1c = os.getenv('LOGIN_1C')
+password_1c = os.getenv('PASSWORD_1C')
+name_of_base = os.getenv('NAME_OF_BASE')
+name_of_file = os.getenv('NAME_OF_FILE')
 
 
 def get_list_of_chats():
