@@ -1,1 +1,4 @@
 .env
+/chats.json
+/last_update_id.txt
+/pending_users.json
